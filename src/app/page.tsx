@@ -1,65 +1,104 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useEffect, useState } from 'react';
+import ProductCard from '@/components/products/ProductCard';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { useLocale } from '@/hooks/useLocale';
+import { PortalProduct } from '@/lib/sap-types';
+
+export default function HomePage() {
+  const [products, setProducts] = useState<PortalProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const { locale, t } = useLocale();
+
+  useEffect(() => {
+    async function loadProducts() {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/sap/products?locale=${locale}`);
+        if (!res.ok) throw new Error('Failed to load products');
+        const data = await res.json();
+        setProducts(data.products);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : t('common.error'));
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadProducts();
+  }, [locale, t]);
+
+  const allLabel = t('home.categoryAll');
+  const categories = [allLabel, ...Array.from(new Set(products.map((p) => p.category)))];
+
+  const filteredProducts =
+    selectedCategory === allLabel
+      ? products
+      : products.filter((p) => p.category === selectedCategory);
+
+  // Reset category filter when locale changes
+  useEffect(() => {
+    setSelectedCategory(allLabel);
+  }, [allLabel]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <section className="mb-10" data-testid="hero-section">
+        <h1 className="text-4xl font-bold text-gray-900" data-testid="page-title">
+          {t('home.title')}
+        </h1>
+        <p className="mt-2 text-lg text-gray-600">
+          {t('home.subtitle')}
+        </p>
+      </section>
+
+      {!loading && !error && products.length > 0 && (
+        <section className="mb-8" aria-label="Category filter">
+          <div className="flex flex-wrap gap-2" data-testid="category-filter">
+            {categories.map((category) => (
+              <button
+                key={category}
+                type="button"
+                onClick={() => setSelectedCategory(category)}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  selectedCategory === category
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+                data-testid={`category-${category.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {loading && <LoadingSpinner message={t('home.loading')} />}
+
+      {error && (
+        <div className="rounded-lg bg-red-50 border border-red-200 p-6 text-center" role="alert" data-testid="error-message">
+          <p className="text-red-800">{error}</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      )}
+
+      {!loading && !error && (
+        <section aria-label="Product listing">
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            data-testid="product-grid"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+          {filteredProducts.length === 0 && (
+            <p className="text-center text-gray-500 py-12">{t('home.noProducts')}</p>
+          )}
+        </section>
+      )}
     </div>
   );
 }
