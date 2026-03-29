@@ -62,7 +62,6 @@ export interface SalesOrderItemPayload {
   Material: string;
   RequestedQuantity: string;
   RequestedQuantityUnit: string;
-  Plant?: string;
   to_ScheduleLine?: {
     results: SalesOrderScheduleLinePayload[];
   };
