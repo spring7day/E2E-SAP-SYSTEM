@@ -60,10 +60,13 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     const poReference = `WEBPORTAL-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
 
-    // Set requested delivery date to today + 7 days (OData V2 date format, UTC midnight)
-    const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-    const deliveryDateMs = todayUTC + 7 * 24 * 60 * 60 * 1000;
-    const requestedDeliveryDate = `/Date(${deliveryDateMs})/`;
+    // Helper: YYYY-MM-DD string → OData V2 /Date(ms)/ format (UTC midnight)
+    const toODataDate = (dateStr: string) => {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return `/Date(${Date.UTC(y, m - 1, d)})/`;
+    };
+    const requestedDeliveryDate = toODataDate(SAP_CONFIG.requestedDeliveryDate);
+    const pricingDate = toODataDate(SAP_CONFIG.pricingDate);
 
     const payload: SalesOrderCreatePayload = {
       SalesOrderType: SAP_CONFIG.defaultOrderType,
@@ -73,6 +76,7 @@ export async function POST(request: NextRequest) {
       SoldToParty: body.soldToParty || SAP_CONFIG.defaultSoldToParty,
       PurchaseOrderByCustomer: poReference,
       RequestedDeliveryDate: requestedDeliveryDate,
+      PricingDate: pricingDate,
       to_Item: {
         results: body.items.map((item, index) => ({
           SalesOrderItem: String((index + 1) * 10),

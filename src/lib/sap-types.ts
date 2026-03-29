@@ -51,6 +51,7 @@ export interface SalesOrderCreatePayload {
   SoldToParty: string;
   PurchaseOrderByCustomer: string;
   RequestedDeliveryDate: string;
+  PricingDate?: string;
   to_Item: {
     results: SalesOrderItemPayload[];
   };
