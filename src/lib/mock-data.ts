@@ -13,7 +13,7 @@ const MATERIAL_IDS = [
   'MZ-FG-M500', 'MZ-FG-M525', 'MZ-FG-M550',
   'MZ-FG-R100', 'MZ-FG-R200', 'MZ-FG-R300',
   'MZ-TG-Y120', 'MZ-TG-Y200', 'MZ-TG-Y240',
-  'TG11', 'TG12',
+  'TG11', 'TG12', 'TG21',
 ];
 
 export const MOCK_PRODUCTS: PortalProduct[] = MATERIAL_IDS.map((id) => {

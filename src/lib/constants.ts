@@ -23,6 +23,7 @@ export const PRODUCT_PRICES: Record<string, { price: number; currency: string }>
   'MZ-TG-Y240': { price: 699.00, currency: 'USD' },
   'TG11': { price: 149.99, currency: 'USD' },
   'TG12': { price: 129.99, currency: 'USD' },
+  'TG21': { price: 139.99, currency: 'USD' },
 };
 
 // Display names - English
@@ -41,6 +42,7 @@ export const PRODUCT_DISPLAY_NAMES: Record<string, string> = {
   'MZ-TG-Y240': 'Youth Bike Y240',
   'TG11': 'Trading Goods 11',
   'TG12': 'Trading Goods 12',
+  'TG21': 'Trading Goods 21',
 };
 
 // Display names - Korean
@@ -59,6 +61,7 @@ export const PRODUCT_DISPLAY_NAMES_KO: Record<string, string> = {
   'MZ-TG-Y240': '\uc720\uc2a4 \ubc14\uc774\ud06c Y240',
   'TG11': '\uc0c1\ud488 11',
   'TG12': '\uc0c1\ud488 12',
+  'TG21': '\uc0c1\ud488 21',
 };
 
 // Product descriptions - English
@@ -77,6 +80,7 @@ export const PRODUCT_DESCRIPTIONS: Record<string, string> = {
   'MZ-TG-Y240': 'Youth bike for riders aged 10-13. Adult-like features in a youth-friendly size.',
   'TG11': 'General trading goods with standard procurement and regular trading process.',
   'TG12': 'General trading goods with reorder point planning and regular trading.',
+  'TG21': 'General trading goods with standard logistics and regular trading process.',
 };
 
 // Product descriptions - Korean
@@ -95,6 +99,7 @@ export const PRODUCT_DESCRIPTIONS_KO: Record<string, string> = {
   'MZ-TG-Y240': '10~13\uc138 \uc5b4\ub9b0\uc774\ub97c \uc704\ud55c \uc720\uc2a4 \ubc14\uc774\ud06c. \uccad\uc18c\ub144\uc5d0 \ub9de\ub294 \uc0ac\uc774\uc988\uc758 \uc131\uc778\uc6a9 \uae30\ub2a5.',
   'TG11': '\ud45c\uc900 \uc870\ub2ec \ubc0f \uc815\uaddc \uac70\ub798 \ud504\ub85c\uc138\uc2a4\uc758 \uc77c\ubc18 \uc0c1\ud488.',
   'TG12': '\uc7ac\uc8fc\ubb38\uc810 \uacc4\ud68d \ubc0f \uc815\uaddc \uac70\ub798 \ud504\ub85c\uc138\uc2a4\uc758 \uc77c\ubc18 \uc0c1\ud488.',
+  'TG21': '\ud45c\uc900 \ubb3c\ub958 \ubc0f \uc815\uaddc \uac70\ub798 \ud504\ub85c\uc138\uc2a4\uc758 \uc77c\ubc18 \uc0c1\ud488.',
 };
 
 // Product category mapping
@@ -113,6 +118,7 @@ export const PRODUCT_CATEGORIES: Record<string, string> = {
   'MZ-TG-Y240': 'Youth Bikes',
   'TG11': 'Accessories',
   'TG12': 'Accessories',
+  'TG21': 'Accessories',
 };
 
 // Korean category names
