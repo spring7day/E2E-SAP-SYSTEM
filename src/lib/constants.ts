@@ -5,8 +5,6 @@ export const SAP_CONFIG = {
   division: process.env.SAP_DIVISION || '00',
   defaultSoldToParty: '17100003',
   defaultOrderType: 'OR',
-  // SAP demo system master data is configured around this date (Fully-Activated Appliance)
-  requestedDeliveryDate: process.env.SAP_REQUESTED_DELIVERY_DATE || '2024-11-01',
 };
 
 // Actual SAP CAL product prices (USD for demo)
