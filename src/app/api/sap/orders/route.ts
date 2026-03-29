@@ -60,9 +60,11 @@ export async function POST(request: NextRequest) {
     const now = new Date();
     const poReference = `WEBPORTAL-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}${String(now.getSeconds()).padStart(2, '0')}`;
 
-    // Set requested delivery date to today+7 days (OData V2 date format, UTC midnight)
-    const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-    const deliveryDateMs = todayUTC + 7 * 24 * 60 * 60 * 1000;
+    // Set requested delivery date to SAP demo system date context (OData V2 date format, UTC midnight)
+    // SAP Fully-Activated Appliance master data (ATP, MRP) is configured around this date
+    const configDate = SAP_CONFIG.requestedDeliveryDate;
+    const [year, month, day] = configDate.split('-').map(Number);
+    const deliveryDateMs = Date.UTC(year, month - 1, day);
     const requestedDeliveryDate = `/Date(${deliveryDateMs})/`;
 
     const payload: SalesOrderCreatePayload = {
