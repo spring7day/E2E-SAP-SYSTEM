@@ -62,16 +62,6 @@ export interface SalesOrderItemPayload {
   Material: string;
   RequestedQuantity: string;
   RequestedQuantityUnit: string;
-  to_ScheduleLine?: {
-    results: SalesOrderScheduleLinePayload[];
-  };
-}
-
-export interface SalesOrderScheduleLinePayload {
-  ScheduleLine: string;
-  RequestedDeliveryDate: string;
-  ScheduleLineOrderQuantity: string;
-  OrderQuantityUnit: string;
 }
 
 // Portal-side types

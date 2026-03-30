@@ -83,14 +83,6 @@ export async function POST(request: NextRequest) {
           Material: item.productId,
           RequestedQuantity: String(item.quantity),
           RequestedQuantityUnit: item.unit || 'EA',
-          to_ScheduleLine: {
-            results: [{
-              ScheduleLine: '1',
-              RequestedDeliveryDate: requestedDeliveryDate,
-              ScheduleLineOrderQuantity: String(item.quantity),
-              OrderQuantityUnit: item.unit || 'EA',
-            }],
-          },
         })),
       },
     };
