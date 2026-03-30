@@ -65,7 +65,10 @@ export async function POST(request: NextRequest) {
       const [y, m, d] = dateStr.split('-').map(Number);
       return `/Date(${Date.UTC(y, m - 1, d)})/`;
     };
-    const requestedDeliveryDate = toODataDate(SAP_CONFIG.requestedDeliveryDate);
+    // Delivery date: today + 7 days (future → SAP ATP can confirm)
+    const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    const requestedDeliveryDate = `/Date(${todayUTC + 7 * 24 * 60 * 60 * 1000})/`;
+    // Pricing date: fixed to demo system date for correct pricing conditions
     const pricingDate = toODataDate(SAP_CONFIG.pricingDate);
 
     const payload: SalesOrderCreatePayload = {
