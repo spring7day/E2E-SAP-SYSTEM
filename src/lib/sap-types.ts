@@ -62,6 +62,7 @@ export interface SalesOrderItemPayload {
   Material: string;
   RequestedQuantity: string;
   RequestedQuantityUnit: string;
+  RequestedDeliveryDate?: string;
 }
 
 // Portal-side types

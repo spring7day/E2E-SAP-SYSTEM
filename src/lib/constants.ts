@@ -6,6 +6,7 @@ export const SAP_CONFIG = {
   defaultSoldToParty: '17100003',
   defaultOrderType: 'OR',
   // SAP demo system date context (Fully-Activated Appliance)
+  requestedDeliveryDate: process.env.SAP_REQUESTED_DELIVERY_DATE || '2024-11-01',
   pricingDate: process.env.SAP_PRICING_DATE || '2024-11-01',
 };
 
