@@ -84,7 +84,6 @@ export async function POST(request: NextRequest) {
           Material: item.productId,
           RequestedQuantity: String(item.quantity),
           RequestedQuantityUnit: item.unit || 'EA',
-          RequestedDeliveryDate: requestedDeliveryDate,
         })),
       },
     };
