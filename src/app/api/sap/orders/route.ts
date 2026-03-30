@@ -65,9 +65,9 @@ export async function POST(request: NextRequest) {
       const [y, m, d] = dateStr.split('-').map(Number);
       return `/Date(${Date.UTC(y, m - 1, d)})/`;
     };
-    // Delivery date: today + 7 days (future → SAP ATP can confirm)
+    // Delivery date: today + 14 days (future → SAP ATP can confirm, buffer for lead time)
     const todayUTC = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-    const requestedDeliveryDate = `/Date(${todayUTC + 7 * 24 * 60 * 60 * 1000})/`;
+    const requestedDeliveryDate = `/Date(${todayUTC + 14 * 24 * 60 * 60 * 1000})/`;
     // Pricing date: fixed to demo system date for correct pricing conditions
     const pricingDate = toODataDate(SAP_CONFIG.pricingDate);
 
