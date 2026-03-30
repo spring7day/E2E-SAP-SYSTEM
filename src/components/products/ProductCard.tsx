@@ -23,8 +23,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       data-testid={`product-card-${product.id}`}
     >
       <Link href={`/products/${product.id}`} data-testid={`product-link-${product.id}`}>
-        <div className="relative aspect-square bg-gray-100 flex items-center justify-center p-8">
-          <div className="text-6xl group-hover:scale-110 transition-transform">
+        <div className="relative aspect-[4/3] bg-gray-100 flex items-center justify-center p-4">
+          <div className="text-5xl group-hover:scale-110 transition-transform">
             {getCategoryIcon(product.category)}
           </div>
           {isOutOfStock && (
