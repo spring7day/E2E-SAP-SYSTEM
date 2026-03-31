@@ -237,8 +237,8 @@ export async function fetchSalesOrderStatus(orderNumber: string): Promise<SAPSal
   return {
     ...d,
     OverallSDProcessStatus: d.OverallSDProcessStatus || '',
-    TotalDeliveryStatus: d.TotalDeliveryStatus || '',
-    OverallBillingStatus: d.OverallBillingStatus || '',
+    OverallDeliveryStatus: d.OverallDeliveryStatus || '',
+    OverallOrdReltdBillgStatus: d.OverallOrdReltdBillgStatus || '',
   } as SAPSalesOrderWithStatus;
 }
 

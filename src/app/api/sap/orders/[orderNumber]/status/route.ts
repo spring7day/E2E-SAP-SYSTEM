@@ -22,21 +22,26 @@ function parseODataDate(dateStr: string | undefined): string | undefined {
 
 function deriveStepsFromSalesOrder(
   overallSDProcessStatus: string,
-  totalDeliveryStatus: string,
-  overallBillingStatus: string
+  overallDeliveryStatus: string,
+  overallOrdReltdBillgStatus: string
 ): OrderTrackingStep[] {
   const allSteps: OrderProcessStep[] = ['ORDER_CREATED', 'DELIVERY_CREATED', 'GOODS_ISSUED', 'DELIVERY_CONFIRMED', 'BILLED'];
 
+  // OverallSDProcessStatus === 'C' 는 전체 O2C 프로세스 완료 (배송+청구 모두)
+  // OverallOrdReltdBillgStatus는 SAP 시스템에 따라 빈 문자열일 수 있으므로
+  // OverallSDProcessStatus를 최우선 판단 기준으로 사용
   let currentStep: OrderProcessStep;
-  if (overallBillingStatus === 'C') {
+  if (overallSDProcessStatus === 'C') {
     currentStep = 'BILLED';
-  } else if (overallBillingStatus === 'B') {
+  } else if (overallOrdReltdBillgStatus === 'B' || overallOrdReltdBillgStatus === 'C') {
     currentStep = 'BILLED';
-  } else if (totalDeliveryStatus === 'C') {
+  } else if (overallDeliveryStatus === 'C') {
     currentStep = 'DELIVERY_CONFIRMED';
-  } else if (totalDeliveryStatus === 'B') {
+  } else if (overallDeliveryStatus === 'B') {
     currentStep = 'GOODS_ISSUED';
-  } else if (overallSDProcessStatus === 'B' && totalDeliveryStatus === 'A') {
+  } else if (overallSDProcessStatus === 'B' && overallDeliveryStatus === 'A') {
+    currentStep = 'DELIVERY_CREATED';
+  } else if (overallSDProcessStatus === 'B') {
     currentStep = 'DELIVERY_CREATED';
   } else {
     currentStep = 'ORDER_CREATED';
@@ -63,7 +68,7 @@ function deriveStepsFromDocuments(
   const hasGoodsIssue = deliveries.some(
     (d) => d.OverallGoodsMovementStatus === 'C' || !!d.ActualGoodsMovementDate
   );
-  const hasDeliveryConfirmed = salesOrder.TotalDeliveryStatus === 'C';
+  const hasDeliveryConfirmed = salesOrder.OverallDeliveryStatus === 'C';
 
   let currentStep: OrderProcessStep;
   if (hasBilling) currentStep = 'BILLED';
@@ -122,16 +127,20 @@ export async function GET(
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
+    // SAP는 주문번호를 선행 0 없이 저장 (예: '12793')
+    // Delivery/Billing 필터에는 SAP가 반환한 실제 주문번호를 사용
+    const sapOrderNumber = salesOrder.SalesOrder;
+
     let deliveries: SAPOutboundDelivery[] = [];
     try {
-      deliveries = await fetchOutboundDeliveries(paddedOrderNumber);
+      deliveries = await fetchOutboundDeliveries(sapOrderNumber);
     } catch (e) {
       console.warn('[Tracking] Delivery API unavailable:', e instanceof Error ? e.message : e);
     }
 
     let billings: SAPBillingDocument[] = [];
     try {
-      billings = await fetchBillingDocuments(paddedOrderNumber);
+      billings = await fetchBillingDocuments(sapOrderNumber);
     } catch (e) {
       console.warn('[Tracking] Billing API unavailable:', e instanceof Error ? e.message : e);
     }
@@ -142,8 +151,8 @@ export async function GET(
         ? deriveStepsFromDocuments(salesOrder, deliveries, billings)
         : deriveStepsFromSalesOrder(
             salesOrder.OverallSDProcessStatus,
-            salesOrder.TotalDeliveryStatus,
-            salesOrder.OverallBillingStatus
+            salesOrder.OverallDeliveryStatus,
+            salesOrder.OverallOrdReltdBillgStatus
           );
 
     const tracking: OrderTrackingResponse = {

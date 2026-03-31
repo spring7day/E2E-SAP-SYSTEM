@@ -66,9 +66,9 @@ export interface SalesOrderItemPayload {
 
 // Sales Order with status fields (for order tracking)
 export interface SAPSalesOrderWithStatus extends SAPSalesOrder {
-  OverallSDProcessStatus: string;  // A=미처리, B=부분처리, C=완료
-  TotalDeliveryStatus: string;     // ''=해당없음, A=미처리, B=부분배송, C=완배송
-  OverallBillingStatus: string;    // ''=해당없음, A=미청구, B=부분청구, C=완청구
+  OverallSDProcessStatus: string;      // A=미처리, B=부분처리, C=완료
+  OverallDeliveryStatus: string;       // ''=해당없음, A=미처리, B=부분배송, C=완배송
+  OverallOrdReltdBillgStatus: string;  // ''=해당없음, A=미청구, B=부분청구, C=완청구 (빈 문자열일 수 있음)
 }
 
 export interface SAPOutboundDelivery {
