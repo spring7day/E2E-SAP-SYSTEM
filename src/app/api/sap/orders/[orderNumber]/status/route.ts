@@ -155,6 +155,17 @@ export async function GET(
             salesOrder.OverallOrdReltdBillgStatus
           );
 
+    console.log('[Tracking] SAP status fields:', {
+      SalesOrder: salesOrder.SalesOrder,
+      OverallSDProcessStatus: salesOrder.OverallSDProcessStatus,
+      OverallDeliveryStatus: salesOrder.OverallDeliveryStatus,
+      OverallOrdReltdBillgStatus: salesOrder.OverallOrdReltdBillgStatus,
+      deliveriesFound: deliveries.length,
+      billingsFound: billings.length,
+      dataSource,
+      currentStep: steps.find(s => s.status === 'current')?.id,
+    });
+
     const tracking: OrderTrackingResponse = {
       salesOrder: salesOrder.SalesOrder,
       customerPO: salesOrder.PurchaseOrderByCustomer || '',
