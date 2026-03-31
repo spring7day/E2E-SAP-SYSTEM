@@ -36,11 +36,24 @@ export interface SAPSalesOrder {
   };
 }
 
+export interface SAPSubsequentProcFlowDoc {
+  SubsequentDocument: string;
+  SubsequentDocumentItem: string;
+  SubsequentDocumentCategory: string; // J=Delivery, R=GoodsMovement/MaterialDoc, M=Billing
+  SDProcessStatus: string;
+  AccountingTransferStatus: string;
+  CreationDate: string;
+  CreationTime: string;
+}
+
 export interface SAPSalesOrderItem {
   SalesOrderItem: string;
   Material: string;
   RequestedQuantity: string;
   RequestedQuantityUnit: string;
+  to_SubsequentProcFlowDocItem?: {
+    results: SAPSubsequentProcFlowDoc[];
+  };
 }
 
 export interface SalesOrderCreatePayload {

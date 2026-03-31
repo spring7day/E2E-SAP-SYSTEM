@@ -214,7 +214,7 @@ export async function fetchStock(
 export async function fetchSalesOrderStatus(orderNumber: string): Promise<SAPSalesOrderWithStatus | null> {
   const path = `/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('${encodeURIComponent(orderNumber)}')`;
   const params = new URLSearchParams({
-    $expand: 'to_Item',
+    $expand: 'to_Item/to_SubsequentProcFlowDocItem',
     $format: 'json',
   });
 
