@@ -56,6 +56,13 @@ export default function Header() {
               {t('header.products')}
             </Link>
             <Link
+              href="/orders/track"
+              className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
+              data-testid="nav-tracking"
+            >
+              {t('header.tracking')}
+            </Link>
+            <Link
               href="/cart"
               className="relative flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors"
               data-testid="nav-cart"

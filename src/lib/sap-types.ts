@@ -64,6 +64,67 @@ export interface SalesOrderItemPayload {
   RequestedQuantityUnit: string;
 }
 
+// Sales Order with status fields (for order tracking)
+export interface SAPSalesOrderWithStatus extends SAPSalesOrder {
+  OverallSDProcessStatus: string;  // A=미처리, B=부분처리, C=완료
+  TotalDeliveryStatus: string;     // ''=해당없음, A=미처리, B=부분배송, C=완배송
+  OverallBillingStatus: string;    // ''=해당없음, A=미청구, B=부분청구, C=완청구
+}
+
+export interface SAPOutboundDelivery {
+  DeliveryDocument: string;
+  ReferenceSDDocument: string;
+  ActualGoodsMovementDate: string;
+  OverallGoodsMovementStatus: string;
+  OverallPickingStatus: string;
+  OverallSDProcessStatus: string;
+}
+
+export interface SAPBillingDocument {
+  BillingDocument: string;
+  SalesDocument: string;
+  BillingDocumentDate: string;
+  TransactionCurrency: string;
+  TotalNetAmount: string;
+}
+
+export type OrderProcessStep = 'ORDER_CREATED' | 'DELIVERY_CREATED' | 'GOODS_ISSUED' | 'DELIVERY_CONFIRMED' | 'BILLED';
+
+export interface OrderTrackingStep {
+  id: OrderProcessStep;
+  status: 'completed' | 'current' | 'pending';
+  date?: string;
+  documentNumber?: string;
+}
+
+export interface OrderTrackingResponse {
+  salesOrder: string;
+  customerPO: string;
+  creationDate: string;
+  soldToParty: string;
+  overallStatus: string;
+  steps: OrderTrackingStep[];
+  items: Array<{
+    itemNumber: string;
+    material: string;
+    quantity: string;
+    unit: string;
+  }>;
+  deliveryDocuments?: Array<{
+    deliveryDocument: string;
+    goodsMovementDate?: string;
+    goodsMovementStatus: string;
+    pickingStatus: string;
+  }>;
+  billingDocuments?: Array<{
+    billingDocument: string;
+    billingDate: string;
+    currency: string;
+    totalAmount: string;
+  }>;
+  dataSource: 'full' | 'sales-order-only' | 'mock';
+}
+
 // Portal-side types
 
 export interface SAPStockResult {

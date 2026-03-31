@@ -59,6 +59,13 @@ export default function ConfirmationPage() {
           >
             {t('confirmation.backToShopping')}
           </Link>
+          <Link
+            href={`/orders/track/${orderId}`}
+            className="rounded-lg border border-blue-600 px-8 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50 transition-colors"
+            data-testid="track-order-btn"
+          >
+            {t('confirmation.trackOrder')}
+          </Link>
         </div>
       </section>
     </div>

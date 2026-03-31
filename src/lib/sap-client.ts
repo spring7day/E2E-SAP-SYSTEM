@@ -1,4 +1,4 @@
-import { SAPProduct, SAPSalesOrder, SAPStockResult, SalesOrderCreatePayload } from './sap-types';
+import { SAPProduct, SAPSalesOrder, SAPSalesOrderWithStatus, SAPOutboundDelivery, SAPBillingDocument, SAPStockResult, SalesOrderCreatePayload } from './sap-types';
 
 const SAP_BASE_URL = process.env.SAP_BASE_URL || '';
 const SAP_CLIENT = process.env.SAP_CLIENT || '100';
@@ -206,4 +206,80 @@ export async function fetchStock(
   }
 
   return stockMap;
+}
+
+/**
+ * Fetch a Sales Order with status fields for order tracking
+ */
+export async function fetchSalesOrderStatus(orderNumber: string): Promise<SAPSalesOrderWithStatus | null> {
+  const path = `/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('${encodeURIComponent(orderNumber)}')`;
+  const params = new URLSearchParams({
+    $select: 'SalesOrder,SalesOrderType,CreationDate,SoldToParty,PurchaseOrderByCustomer,OverallSDProcessStatus,TotalDeliveryStatus,OverallBillingStatus',
+    $expand: 'to_Item',
+    $format: 'json',
+  });
+
+  const url = `${SAP_BASE_URL}${path}?${params}`;
+  const response = await fetch(url, {
+    headers: getDefaultHeaders(),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    if (response.status === 404) return null;
+    throw new Error(`SAP API error: ${response.status} ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.d as SAPSalesOrderWithStatus;
+}
+
+/**
+ * Fetch Outbound Delivery documents for a given Sales Order
+ */
+export async function fetchOutboundDeliveries(orderNumber: string): Promise<SAPOutboundDelivery[]> {
+  const path = `/sap/opu/odata/sap/API_OUTBOUND_DELIVERY_SRV;v=0002/A_OutboundDeliveryHeader`;
+  const params = new URLSearchParams({
+    $filter: `ReferenceSDDocument eq '${orderNumber}'`,
+    $select: 'DeliveryDocument,ReferenceSDDocument,ActualGoodsMovementDate,OverallGoodsMovementStatus,OverallPickingStatus,OverallSDProcessStatus',
+    $format: 'json',
+  });
+
+  const url = `${SAP_BASE_URL}${path}?${params}`;
+  const response = await fetch(url, {
+    headers: getDefaultHeaders(),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(`SAP Delivery API error: ${response.status} ${response.statusText}`);
+  }
+
+  const data: ODataResponse<SAPOutboundDelivery> = await response.json();
+  return data.d.results || [];
+}
+
+/**
+ * Fetch Billing Documents for a given Sales Order
+ */
+export async function fetchBillingDocuments(orderNumber: string): Promise<SAPBillingDocument[]> {
+  const path = `/sap/opu/odata/sap/API_BILLING_DOCUMENT_SRV/A_BillingDocument`;
+  const params = new URLSearchParams({
+    $filter: `SalesDocument eq '${orderNumber}'`,
+    $select: 'BillingDocument,SalesDocument,BillingDocumentDate,TransactionCurrency,TotalNetAmount',
+    $format: 'json',
+  });
+
+  const url = `${SAP_BASE_URL}${path}?${params}`;
+  const response = await fetch(url, {
+    headers: getDefaultHeaders(),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(`SAP Billing API error: ${response.status} ${response.statusText}`);
+  }
+
+  const data: ODataResponse<SAPBillingDocument> = await response.json();
+  return data.d.results || [];
 }
