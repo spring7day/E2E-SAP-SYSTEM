@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useLocale } from '@/hooks/useLocale';
-import { OrderTrackingResponse } from '@/lib/sap-types';
+import { OrderTrackingResponse, OrderProcessStep } from '@/lib/sap-types';
 import OrderStatusStepper from '@/components/orders/OrderStatusStepper';
 import OrderItemsTable from '@/components/orders/OrderItemsTable';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -13,6 +13,22 @@ const DATA_SOURCE_KEY: Record<OrderTrackingResponse['dataSource'], string> = {
   full: 'tracking.dataSource.full',
   'sales-order-only': 'tracking.dataSource.salesOrderOnly',
   mock: 'tracking.dataSource.mock',
+};
+
+const STEP_I18N_KEY: Record<OrderProcessStep, string> = {
+  ORDER_CREATED: 'tracking.step.orderCreated',
+  DELIVERY_CREATED: 'tracking.step.deliveryCreated',
+  GOODS_ISSUED: 'tracking.step.goodsIssued',
+  DELIVERY_CONFIRMED: 'tracking.step.deliveryConfirmed',
+  BILLED: 'tracking.step.billed',
+};
+
+const STEP_COLOR: Record<OrderProcessStep, string> = {
+  ORDER_CREATED: 'bg-blue-100 text-blue-700',
+  DELIVERY_CREATED: 'bg-indigo-100 text-indigo-700',
+  GOODS_ISSUED: 'bg-amber-100 text-amber-700',
+  DELIVERY_CONFIRMED: 'bg-teal-100 text-teal-700',
+  BILLED: 'bg-green-100 text-green-700',
 };
 
 export default function OrderTrackResultPage() {
@@ -158,6 +174,20 @@ export default function OrderTrackResultPage() {
                   <dt className="text-gray-500">{t('tracking.soldToParty')}</dt>
                   <dd className="font-mono text-gray-900">{tracking.soldToParty}</dd>
                 </div>
+                {(() => {
+                  const currentStep = tracking.steps.find(s => s.status === 'current');
+                  if (!currentStep) return null;
+                  return (
+                    <div className="flex justify-between items-center text-sm pt-2 mt-2 border-t border-gray-100">
+                      <dt className="text-gray-500">{t('tracking.currentStatus')}</dt>
+                      <dd>
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${STEP_COLOR[currentStep.id]}`}>
+                          {t(STEP_I18N_KEY[currentStep.id])}
+                        </span>
+                      </dd>
+                    </div>
+                  );
+                })()}
               </dl>
             </div>
 
