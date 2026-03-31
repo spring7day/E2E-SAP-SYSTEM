@@ -181,6 +181,9 @@ export async function GET(
     return NextResponse.json({ tracking });
   } catch (error) {
     console.error('[Tracking] SAP error, falling back to mock:', error);
-    return NextResponse.json({ tracking: getMockOrderTracking(paddedOrderNumber) });
+    return NextResponse.json({
+      tracking: getMockOrderTracking(paddedOrderNumber),
+      warning: 'SAP connection failed. Showing demo data.',
+    });
   }
 }

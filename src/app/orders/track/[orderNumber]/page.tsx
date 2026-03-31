@@ -24,11 +24,13 @@ export default function OrderTrackResultPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState(false);
+  const [warning, setWarning] = useState<string | null>(null);
 
   const fetchTracking = useCallback(async () => {
     setLoading(true);
     setNotFound(false);
     setError(false);
+    setWarning(null);
     try {
       const res = await fetch(`/api/sap/orders/${encodeURIComponent(orderNumber)}/status`);
       if (res.status === 404) {
@@ -41,6 +43,7 @@ export default function OrderTrackResultPage() {
       }
       const data = await res.json();
       setTracking(data.tracking);
+      if (data.warning) setWarning(data.warning);
     } catch {
       setError(true);
     } finally {
@@ -120,6 +123,12 @@ export default function OrderTrackResultPage() {
       {/* 결과 */}
       {!loading && tracking && (
         <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">
+          {/* SAP 연결 실패 / Mock 데이터 경고 배너 */}
+          {(warning || tracking.dataSource === 'mock') && (
+            <div className="col-span-full rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-800">
+              {warning || t('tracking.dataSource.mock')}
+            </div>
+          )}
           {/* 왼쪽: 주문 정보 + Stepper */}
           <div className="space-y-6">
             {/* 주문 정보 카드 */}

@@ -214,12 +214,12 @@ export async function fetchStock(
 export async function fetchSalesOrderStatus(orderNumber: string): Promise<SAPSalesOrderWithStatus | null> {
   const path = `/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder('${encodeURIComponent(orderNumber)}')`;
   const params = new URLSearchParams({
-    $select: 'SalesOrder,SalesOrderType,CreationDate,SoldToParty,PurchaseOrderByCustomer,OverallSDProcessStatus,TotalDeliveryStatus,OverallBillingStatus',
     $expand: 'to_Item',
     $format: 'json',
   });
 
   const url = `${SAP_BASE_URL}${path}?${params}`;
+  console.log('[Tracking] Fetching Sales Order:', url);
   const response = await fetch(url, {
     headers: getDefaultHeaders(),
     cache: 'no-store',
@@ -227,11 +227,19 @@ export async function fetchSalesOrderStatus(orderNumber: string): Promise<SAPSal
 
   if (!response.ok) {
     if (response.status === 404) return null;
+    const errorBody = await response.text();
+    console.error('[Tracking] SAP Sales Order API error:', response.status, errorBody.substring(0, 500));
     throw new Error(`SAP API error: ${response.status} ${response.statusText}`);
   }
 
   const data = await response.json();
-  return data.d as SAPSalesOrderWithStatus;
+  const d = data.d;
+  return {
+    ...d,
+    OverallSDProcessStatus: d.OverallSDProcessStatus || '',
+    TotalDeliveryStatus: d.TotalDeliveryStatus || '',
+    OverallBillingStatus: d.OverallBillingStatus || '',
+  } as SAPSalesOrderWithStatus;
 }
 
 /**
